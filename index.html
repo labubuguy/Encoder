@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>6–7 Encoder</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #0e0c02;
+      color: #ffd84d;
+      font-family: monospace;
+      margin: 0;
+    }
+    .container {
+      width: 90%;
+      max-width: 500px;
+    }
+    textarea, .output {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 10px;
+      border: none;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      background-color: #1a1805;
+      color: #ffd84d;
+      box-sizing: border-box;
+    }
+    .output {
+      min-height: 2rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <textarea id="input" placeholder="Type text to encode..."></textarea>
+    <div id="output" class="output"></div>
+  </div>
+
+  <script>
+    const map = {
+      '0': '666', '1': '667', '2': '676', '3': '677',
+      '4': '766', '5': '767', '6': '776', '7': '777',
+      '8': '666', '9': '667', // reuse for 8,9 for simplicity
+    };
+
+    function encode() {
+      const raw = document.getElementById('input').value.toUpperCase();
+      let result = '';
+
+      for (const char of raw) {
+        if (char >= '0' && char <= '9') {
+          result += map[char];
+        } else if (char >= 'A' && char <= 'Z') {
+          const value = char.charCodeAt(0) - 55; // A=10, B=11...
+          const high = Math.floor(value / 8);
+          const low = value % 8;
+          const highCode = Object.keys(map).find(k => parseInt(k) === high);
+          const lowCode = Object.keys(map).find(k => parseInt(k) === low);
+          result += map[highCode] + map[lowCode];
+        }
+      }
+
+      document.getElementById('output').textContent = result;
+    }
+
+    document.getElementById('input').addEventListener('input', encode);
+  </script>
+</body>
+</html>
