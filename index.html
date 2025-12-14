@@ -1,40 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>6–7 Encoder</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>6-7 Encoder (Aligned)</title>
   <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #0e0c02;
-      color: #ffd84d;
-      font-family: monospace;
-      margin: 0;
-    }
-    .container {
-      width: 90%;
-      max-width: 500px;
-    }
-    textarea, .output {
-      width: 100%;
-      padding: 1rem;
-      border-radius: 10px;
-      border: none;
-      margin-bottom: 1rem;
-      font-size: 1rem;
-      background-color: #1a1805;
-      color: #ffd84d;
-      box-sizing: border-box;
-    }
-    .output {
-      min-height: 2rem;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle at top, #2a2400 0%, #0a0800 70%); color: #ffe27a; }
+    .container { width: 90%; max-width: 500px; }
+    textarea, .output { width: 100%; padding: 1rem; border-radius: 10px; border: none; margin-bottom: 1rem; font-size: 1.2rem; background: #0e0c02; color: #ffd84d; font-family: monospace; box-sizing: border-box; }
+    .output { min-height: 2.5rem; word-break: break-word; }
   </style>
 </head>
 <body>
@@ -44,29 +19,28 @@
   </div>
 
   <script>
-    const map = {
-      '0': '666', '1': '667', '2': '676', '3': '677',
-      '4': '766', '5': '767', '6': '776', '7': '777',
-      '8': '666', '9': '667', // reuse for 8,9 for simplicity
-    };
+    const mapEncode = {0:'666',1:'667',2:'676',3:'677',4:'766',5:'767',6:'776',7:'777'};
+
+    function encodeChar(char) {
+      char = char.toUpperCase();
+      let value;
+      if(char >= '0' && char <= '9') value = parseInt(char);
+      else if(char >= 'A' && char <= 'Z') value = char.charCodeAt(0) - 55;
+      else return '';
+
+      // Always produce 2 base-8 digits per character for alignment
+      let high = Math.floor(value / 8);
+      let low = value % 8;
+
+      return mapEncode[high] + mapEncode[low];
+    }
 
     function encode() {
-      const raw = document.getElementById('input').value.toUpperCase();
+      const raw = document.getElementById('input').value;
       let result = '';
-
-      for (const char of raw) {
-        if (char >= '0' && char <= '9') {
-          result += map[char];
-        } else if (char >= 'A' && char <= 'Z') {
-          const value = char.charCodeAt(0) - 55; // A=10, B=11...
-          const high = Math.floor(value / 8);
-          const low = value % 8;
-          const highCode = Object.keys(map).find(k => parseInt(k) === high);
-          const lowCode = Object.keys(map).find(k => parseInt(k) === low);
-          result += map[highCode] + map[lowCode];
-        }
+      for(const c of raw) {
+        result += encodeChar(c);
       }
-
       document.getElementById('output').textContent = result;
     }
 
